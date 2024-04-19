@@ -1,0 +1,13 @@
+{
+    "configurations": [
+      {
+        "name": "nginx",
+        "includePath": [
+          "${workspaceFolder}/**",
+          "../nginx/src/**"
+        ]
+      }
+    ],
+    "version": 4
+  }
+  
