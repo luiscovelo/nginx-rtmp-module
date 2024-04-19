@@ -264,14 +264,21 @@ ngx_rtmp_live_get_stream(ngx_rtmp_session_t *s, u_char *name, int create)
 static void
 ngx_rtmp_live_idle(ngx_event_t *pev)
 {
+    ngx_rtmp_live_ctx_t        *ctx;
     ngx_connection_t           *c;
     ngx_rtmp_session_t         *s;
 
     c = pev->data;
     s = c->data;
-
-    ngx_log_error(NGX_LOG_ERR, s->connection->log, 0,
+    
+    ctx = ngx_rtmp_get_module_ctx(s, ngx_rtmp_live_module);
+    if (ctx == NULL) {
+        ngx_log_error(NGX_LOG_ERR, s->connection->log, 0,
                   "live: drop idle publisher");
+    } else {
+        ngx_log_error(NGX_LOG_ERR, s->connection->log, 0,
+                  "live: drop idle publisher, name: '%s'", ctx->stream->name);
+    }
 
     ngx_rtmp_finalize_session(s);
 }
@@ -533,7 +540,7 @@ ngx_rtmp_live_join(ngx_rtmp_session_t *s, u_char *name, unsigned publisher)
     if (publisher) {
         if ((*stream)->publishing) {
             ngx_log_error(NGX_LOG_ERR, s->connection->log, 0,
-                          "live: already publishing");
+                          "live: already publishing, name: '%s'", (*stream)->name);
 
             ngx_rtmp_send_status(s, "NetStream.Publish.BadName", "error",
                                  "Already publishing");
